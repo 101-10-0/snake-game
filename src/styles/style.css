@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+/* Main page layout and background */
+body {
+    /* Center all content vertically and horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Make background fill entire viewport */
+    height: 100vh;
+    margin: 0;
+    /* Set up Howl's Moving Castle background image */
+    background: url('../images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Cinzel', 'Times New Roman', serif;
+}
+
+/* Container that holds the game canvas and start button */
+.game-container {
+    /* Enable absolute positioning for children (start button) */
+    position: relative;
+    /* Semi-transparent cream colored background */
+    background: rgba(235, 204, 238, 0.648);
+    /* Space around the canvas */
+    padding: 15px;
+    /* Rounded corners for magical window effect */
+    border-radius: 15px;
+    /* Purple magical glow effect */
+    box-shadow: 0 0 0px rgba(142, 68, 173, 0.3);
+    /* Purple border matching Howl's magic theme */
+    border: 0px solid #8E44AD;
+    /* Ensure nothing spills outside container */
+    overflow: hidden;
+}
+
+/* Title image styling */
+.title-image {
+    width: 450px;  /* Adjust width as needed */
+    height: 150px; /* Adjust height as needed */
+    background: url('../images/title.jpg') no-repeat center center;
+    background-size: contain;
+    margin: 0 auto 10px auto;
+}
+
+/* The game canvas where snake and food are drawn */
+#gameCanvas {
+    /* Remove any inline spacing */
+    display: relative;
+    /* Matching purple border from container */
+    border: 5px solid #dedae05b;
+    /* Slightly rounded corners */
+    border-radius: 0px;
+    /* Semi-transparent cream background */
+    background-color: rgba(198, 171, 198, 0.113);
+}
+
+/* Start game button styling */
+.start-button {
+    /* Position at bottom center of container */
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Button size and spacing */
+    padding: 12px 25px;
+    font-size: 24px;
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    font-weight: 700;
+    cursor: pointer;
+    /* Magical purple and gold color scheme */
+    background-color: #8E44AD;
+    color: #dcb6e9;
+    border: 0px solid #8E44AD;
+    border-radius: 25px;
+    /* Smooth transition for hover effects */
+    transition: all 0.3s ease;
+    /* Text styling */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    /* Magical glow effect */
+    box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+}
+
+/* Interactive hover effect for start button */
+.start-button:hover {
+    /* Lighter purple on hover */
+    background-color: #9e6bb3;
+    /* Slight floating effect */
+    transform: translateX(-50%) translateY(-2px);
+    /* Enhanced magical glow */
+    box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+}
