@@ -10,22 +10,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameLoop = null;
     let currentDirection = 'right';
     let nextDirection = 'right';
+    let gameStarted = false;
+    let snake;
+    let food;
 
     // Snake object definition
-    const Snake = {
-        body: [
-            { x: 10, y: 10 } // head only, no initial body segments
-        ],
-        
-        reset: function() {
+    class Snake {
+        constructor() {
+            this.body = [
+                { x: 10, y: 10 } // head only, no initial body segments
+            ];
+        }
+
+        reset() {
             this.body = [
                 { x: 10, y: 10 } // reset to head only
             ];
             currentDirection = 'right';
             nextDirection = 'right';
-        },
+        }
 
-        move: function(food) {
+        move(food) {
             // Get next head position
             const head = { ...this.body[0] };
             switch(nextDirection) {
@@ -48,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             return ate;
-        },
+        }
 
-        changeDirection: function(newDirection) {
+        changeDirection(newDirection) {
             const opposites = {
                 'up': 'down',
                 'down': 'up',
@@ -62,9 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (opposites[newDirection] !== currentDirection) {
                 nextDirection = newDirection;
             }
-        },
+        }
 
-        checkCollision: function(gridSize) {
+        checkCollision(gridSize) {
             const head = this.body[0];
             
             // Check wall collision
@@ -77,91 +82,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 segment.x === head.x && segment.y === head.y
             );
         }
-    };
 
-    // Load castle image for snake head
-    const headImage = new Image();
-    headImage.src = './images/castle.png';  // Updated path to be relative to HTML file location
-
-    let imageLoaded = false;
-    headImage.onload = () => {
-        console.log('Image loaded successfully');
-        imageLoaded = true;
-        startButton.disabled = false;
-        // Do initial draw after image loads
-        draw();
-    };
-    
-    headImage.onerror = (err) => {
-        console.error('Failed to load castle image:', err);
-        imageLoaded = false;
-        startButton.disabled = false;
-        // Do initial draw even if image fails to load
-        draw();
-    };
-
-    // Initialize Food
-    const Food = {
-        position: { x: 15, y: 15 },
-        gridSize: GRID_SIZE,
-        
-        init: function() {
-            this.position = this.getRandomPosition();
-        },
-        
-        getRandomPosition: function() {
-            return {
-                x: Math.floor(Math.random() * this.gridSize),
-                y: Math.floor(Math.random() * this.gridSize)
-            };
-        },
-        
-        respawn: function() {
-            this.position = this.getRandomPosition();
+        eat(food) {
+            const head = this.body[0];
+            return head.x === food.position.x && head.y === food.position.y;
         }
-    };
 
-    function draw() {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        update() {
+            if (isGameOver) return;
 
-        // Draw snake
-        Snake.body.forEach((segment, index) => {
-            if (index === 0) {
-                // Always use fallback rectangle for head until image is fully loaded
-                if (imageLoaded && headImage.complete && headImage.naturalWidth > 0) {
-                    try {
-                        // Draw head using castle image
-                        ctx.save();
-                        // Calculate rotation based on direction
-                        const rotation = {
-                            'up': -Math.PI/2,
-                            'down': Math.PI/2,
-                            'left': Math.PI,
-                            'right': 0
-                        }[currentDirection] || 0;
-                        
-                        // Center of the cell
-                        const x = segment.x * CELL_SIZE + CELL_SIZE/2;
-                        const y = segment.y * CELL_SIZE + CELL_SIZE/2;
-                        
-                        // Rotate around center point
-                        ctx.translate(x, y);
-                        ctx.rotate(rotation);
-                        ctx.translate(-x, -y);
-                        
-                        // Draw the castle image
-                        ctx.drawImage(
-                            headImage,
-                            segment.x * CELL_SIZE,
-                            segment.y * CELL_SIZE,
-                            CELL_SIZE,
-                            CELL_SIZE
-                        );
-                        ctx.restore();
-                    } catch (error) {
-                        console.error('Error drawing image:', error);
-                        // Fallback if drawing fails
+            if (this.move(food)) {
+                food.respawn();
+            }
+
+            if (this.checkCollision(GRID_SIZE)) {
+                isGameOver = true;
+                clearInterval(gameLoop);
+                // Show modal on game over
+                const modal = document.getElementById('instructionModal');
+                modal.style.display = 'block';
+            }
+        }
+
+        draw() {
+            // Draw snake
+            this.body.forEach((segment, index) => {
+                if (index === 0) {
+                    // Always use fallback rectangle for head until image is fully loaded
+                    if (imageLoaded && headImage.complete && headImage.naturalWidth > 0) {
+                        try {
+                            // Draw head using castle image
+                            ctx.save();
+                            // Calculate rotation based on direction
+                            const rotation = {
+                                'up': -Math.PI/2,
+                                'down': Math.PI/2,
+                                'left': Math.PI,
+                                'right': 0
+                            }[currentDirection] || 0;
+                            
+                            // Center of the cell
+                            const x = segment.x * CELL_SIZE + CELL_SIZE/2;
+                            const y = segment.y * CELL_SIZE + CELL_SIZE/2;
+                            
+                            // Rotate around center point
+                            ctx.translate(x, y);
+                            ctx.rotate(rotation);
+                            ctx.translate(-x, -y);
+                            
+                            // Draw the castle image
+                            ctx.drawImage(
+                                headImage,
+                                segment.x * CELL_SIZE,
+                                segment.y * CELL_SIZE,
+                                CELL_SIZE,
+                                CELL_SIZE
+                            );
+                            ctx.restore();
+                        } catch (error) {
+                            console.error('Error drawing image:', error);
+                            // Fallback if drawing fails
+                            ctx.fillStyle = '#4A235A';
+                            ctx.fillRect(
+                                segment.x * CELL_SIZE,
+                                segment.y * CELL_SIZE,
+                                CELL_SIZE - 1,
+                                CELL_SIZE - 1
+                            );
+                        }
+                    } else {
+                        // Fallback - draw rectangle if image not loaded
                         ctx.fillStyle = '#4A235A';
                         ctx.fillRect(
                             segment.x * CELL_SIZE,
@@ -171,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         );
                     }
                 } else {
-                    // Fallback - draw rectangle if image not loaded
-                    ctx.fillStyle = '#4A235A';
+                    // Draw body segments as before
+                    ctx.fillStyle = '#8E44AD';
                     ctx.fillRect(
                         segment.x * CELL_SIZE,
                         segment.y * CELL_SIZE,
@@ -180,129 +170,135 @@ document.addEventListener('DOMContentLoaded', () => {
                         CELL_SIZE - 1
                     );
                 }
-            } else {
-                // Draw body segments as before
-                ctx.fillStyle = '#8E44AD';
-                ctx.fillRect(
-                    segment.x * CELL_SIZE,
-                    segment.y * CELL_SIZE,
-                    CELL_SIZE - 1,
-                    CELL_SIZE - 1
-                );
-            }
-        });
-
-        // Draw food
-        ctx.fillStyle = 'Hotpink';
-        ctx.fillRect(
-            Food.position.x * CELL_SIZE,
-            Food.position.y * CELL_SIZE,
-            CELL_SIZE - 1,
-            CELL_SIZE - 1
-        );
-
-        if (isGameOver) {
-            ctx.fillStyle = 'Purple';
-            ctx.font = 'bold 30px Cinzel, serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Game Over!', canvas.width/2, canvas.height/2);
+            });
         }
     }
 
-    function update() {
-        if (isGameOver) return;
+    // Load castle image for snake head
+    const headImage = new Image();
+    headImage.src = './images/castle.png';  // Updated path to be relative to HTML file location
 
-        if (Snake.move(Food)) {
-            Food.respawn();
+    let imageLoaded = false;
+    headImage.onload = () => {
+        console.log('Image loaded successfully');
+        imageLoaded = true;
+        if (snake) {
+            snake.draw();
+        }
+    };
+    
+    headImage.onerror = (err) => {
+        console.error('Failed to load castle image:', err);
+        imageLoaded = false;
+    };
+
+    // Initialize Food
+    class Food {
+        constructor() {
+            this.position = { x: 15, y: 15 };
+            this.gridSize = GRID_SIZE;
+        }
+        
+        init() {
+            this.position = this.getRandomPosition();
+        }
+        
+        getRandomPosition() {
+            return {
+                x: Math.floor(Math.random() * this.gridSize),
+                y: Math.floor(Math.random() * this.gridSize)
+            };
+        }
+        
+        respawn() {
+            this.position = this.getRandomPosition();
         }
 
-        if (Snake.checkCollision(GRID_SIZE)) {
+        draw() {
+            // Draw food
+            ctx.fillStyle = 'Hotpink';
+            ctx.fillRect(
+                this.position.x * CELL_SIZE,
+                this.position.y * CELL_SIZE,
+                CELL_SIZE - 1,
+                CELL_SIZE - 1
+            );
+        }
+    }
+
+    function checkGameOver() {
+        if (snake.checkCollision(GRID_SIZE)) {
             isGameOver = true;
             clearInterval(gameLoop);
-            startButton.style.display = 'block';
+            const gameOverModal = document.getElementById('gameOverModal');
+            gameOverModal.style.display = 'flex';
+            return true;
         }
+        return false;
     }
 
-    function startGame() {
-        // Reset game state
+    function startFirstGame() {
+        const instructionModal = document.getElementById('instructionModal');
+        instructionModal.style.display = 'none';
+        initGame();
+        setupControls();
+    }
+
+    function restartGame() {
+        const gameOverModal = document.getElementById('gameOverModal');
+        gameOverModal.style.display = 'none';
+        initGame();
+    }
+
+    function setupControls() {
+        document.addEventListener('keydown', function(e) {
+            if (!gameStarted || isGameOver) return;
+            
+            switch(e.key) {
+                case 'ArrowUp': snake.changeDirection('up'); break;
+                case 'ArrowDown': snake.changeDirection('down'); break;
+                case 'ArrowLeft': snake.changeDirection('left'); break;
+                case 'ArrowRight': snake.changeDirection('right'); break;
+            }
+        });
+    }
+
+    function initGame() {
+        snake = new Snake();
+        food = new Food();
+        food.init();
         isGameOver = false;
-        Snake.reset();
-        Food.init();
-        
-        // Hide start button
-        startButton.style.display = 'none';
-        
-        // Clear any existing game loop
-        if (gameLoop) clearInterval(gameLoop);
-        
-        // Start new game loop
+        gameStarted = true;
+
+        if (gameLoop) {
+            clearInterval(gameLoop);
+        }
+
         gameLoop = setInterval(() => {
-            update();
-            draw();
+            if (!isGameOver) {
+                if (checkGameOver()) return;
+
+                if (snake.eat(food)) {
+                    snake.move(food);
+                    food.respawn();
+                } else {
+                    snake.move(food);
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                food.draw();
+                snake.draw();
+            }
         }, GAME_SPEED);
     }
 
-    // Create and handle start button
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start Game';
-    startButton.className = 'start-button';
-    startButton.style.fontFamily = 'Cinzel, serif';
-    startButton.style.fontSize = '20px';
-    startButton.style.fontWeight = 'bold';
-    startButton.disabled = true; // Disable until image loads
-    canvas.parentNode.insertBefore(startButton, canvas.nextSibling);
-    startButton.addEventListener('click', startGame);
+    // Make functions globally available
+    window.startFirstGame = startFirstGame;
+    window.restartGame = restartGame;
 
-    // Keyboard controls
-    document.addEventListener('keydown', (e) => {
-        switch (e.key) {
-            case 'ArrowUp': Snake.changeDirection('up'); break;
-            case 'ArrowDown': Snake.changeDirection('down'); break;
-            case 'ArrowLeft': Snake.changeDirection('left'); break;
-            case 'ArrowRight': Snake.changeDirection('right'); break;
-        }
-    });
-
-    // Add touch controls
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, false);
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-    }, false);
-
-    canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
-
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-
-        // Determine swipe direction
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            // Horizontal swipe
-            if (deltaX > 0) {
-                Snake.changeDirection('right');
-            } else {
-                Snake.changeDirection('left');
-            }
-        } else {
-            // Vertical swipe
-            if (deltaY > 0) {
-                Snake.changeDirection('down');
-            } else {
-                Snake.changeDirection('up');
-            }
-        }
-    }, false);
-
-    // Remove the immediate initial draw and replace with a debounced draw
-    setTimeout(draw, 100); // Debounced initial draw in case image loads very quickly
+    // Show instruction modal only on first load
+    window.onload = function() {
+        const instructionModal = document.getElementById('instructionModal');
+        instructionModal.style.display = 'flex';
+    };
 });

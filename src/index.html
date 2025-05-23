@@ -9,6 +9,29 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+    <div id="instructionModal" class="modal">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <div class="desktop-instructions">
+                <p>Use arrow keys ↑ ← ↓ → to control the castle's movement</p>
+                <p>Collect magic stars to grow your castle!</p>
+                <p>Avoid hitting the walls or yourself</p>
+            </div>
+            <div class="mobile-instructions">
+                <p>Swipe in any direction to move the castle</p>
+                <p>Collect magic stars to grow your castle!</p>
+                <p>Avoid hitting the walls or yourself</p>
+            </div>
+            <button class="start-button" onclick="startFirstGame()">Start Game</button>
+        </div>
+    </div>
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>Your castle has fallen!</p>
+            <button class="start-button" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
     <div class="game-container">
         <div class="title-image"></div>
         <canvas id="gameCanvas" width="500" height="500"></canvas>

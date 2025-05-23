@@ -91,6 +91,80 @@ body {
     box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
 }
 
+/* Instructions styling */
+.instructions {
+    text-align: center;
+    color: #8E44AD;
+    font-size: 16px;
+    margin: 10px 0;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+}
+
+.mobile-instructions {
+    display: none;
+}
+
+.desktop-instructions {
+    display: block;
+}
+
+/* Modal styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: rgba(235, 204, 238, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    border: 2px solid #8E44AD;
+    box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);
+}
+
+.modal-content h2 {
+    color: #8E44AD;
+    margin-bottom: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+}
+
+.modal-content p {
+    color: #6d4e7a;
+    margin: 15px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.modal .start-button {
+    position: static;
+    display: inline-block;
+    margin: 20px auto 0;
+    transform: none;
+}
+
+/* Game over modal specific styles */
+#gameOverModal {
+    display: none;  /* Hide game over modal by default */
+}
+
+#instructionModal {
+    display: flex;  /* Show instruction modal by default */
+}
+
 /* Mobile-specific styles */
 @media (max-width: 768px) {
     .game-container {
@@ -116,5 +190,24 @@ body {
     .start-button {
         font-size: 18px;
         padding: 10px 20px;
+    }
+    
+    .mobile-instructions {
+        display: block;
+        font-size: 14px;
+    }
+    
+    .desktop-instructions {
+        display: none;
+    }
+    
+    .modal-content {
+        margin: 20px;
+        padding: 20px;
+        max-width: 300px;
+    }
+    
+    .modal-content p {
+        font-size: 14px;
     }
 }
