@@ -251,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupControls() {
+        // Keyboard controls
         document.addEventListener('keydown', function(e) {
             if (!gameStarted || isGameOver) return;
             
@@ -261,6 +262,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'ArrowRight': snake.changeDirection('right'); break;
             }
         });
+
+        // Touch controls
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        canvas.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            e.preventDefault();
+        }, false);
+
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, false);
+
+        canvas.addEventListener('touchend', function(e) {
+            if (!gameStarted || isGameOver) return;
+            
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            // Determine swipe direction based on which axis had larger movement
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal swipe
+                if (dx > 0) {
+                    snake.changeDirection('right');
+                } else {
+                    snake.changeDirection('left');
+                }
+            } else {
+                // Vertical swipe
+                if (dy > 0) {
+                    snake.changeDirection('down');
+                } else {
+                    snake.changeDirection('up');
+                }
+            }
+            
+            e.preventDefault();
+        }, false);
     }
 
     function initGame() {
