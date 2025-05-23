@@ -35,8 +35,8 @@ body {
 
 /* Title image styling */
 .title-image {
-    width: 450px;  /* Adjust width as needed */
-    height: 150px; /* Adjust height as needed */
+    width: 450px;  /* Restore original fixed width */
+    height: 150px; /* Restore original fixed height */
     background: url('../images/title.jpg') no-repeat center center;
     background-size: contain;
     margin: 0 auto 10px auto;
@@ -107,8 +107,10 @@ body {
 
     .title-image {
         width: 100%;
-        max-width: 450px;
-        height: auto;
+        max-width: 300px;
+        height: 60px;
+        background-size: contain;
+        margin: 0 auto 5px auto;
     }
 
     .start-button {
