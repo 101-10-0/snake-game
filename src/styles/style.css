@@ -90,3 +90,29 @@ body {
     /* Enhanced magical glow */
     box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
 }
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .game-container {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    #gameCanvas {
+        width: 100%;
+        height: auto;
+        max-width: 500px;
+    }
+
+    .title-image {
+        width: 100%;
+        max-width: 450px;
+        height: auto;
+    }
+
+    .start-button {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+}

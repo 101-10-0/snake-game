@@ -263,6 +263,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Add touch controls
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, false);
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, false);
+
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        // Determine swipe direction
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (deltaX > 0) {
+                Snake.changeDirection('right');
+            } else {
+                Snake.changeDirection('left');
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > 0) {
+                Snake.changeDirection('down');
+            } else {
+                Snake.changeDirection('up');
+            }
+        }
+    }, false);
+
     // Remove the immediate initial draw and replace with a debounced draw
     setTimeout(draw, 100); // Debounced initial draw in case image loads very quickly
 });
